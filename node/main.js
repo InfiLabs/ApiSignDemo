@@ -3,7 +3,7 @@ const config = require("./config/config");
 const InfiUserType = require("./define/infiUserType");
 async function createBoard(){
     let infiApiHttpClient = new InfiApiHttpClient(config.appId, config.signKey, config.infiWbsPath);
-    let res = await infiApiHttpClient.createWhiteBoard({creatorId:"infi"},{})
+    let res = await infiApiHttpClient.createWhiteBoard({creatorId:"test"},{})
     if (!res) {
         throw new Error("create whiteboard failed");
     }
@@ -31,7 +31,7 @@ async function main() {
     // 创建白板
     await createBoard()
     // 计算白板连接的签名
-    await calculateBalanceParams()
+    //await calculateBalanceParams()
 }
 
 main()

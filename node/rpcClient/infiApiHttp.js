@@ -86,6 +86,7 @@ class InfiApiHttpClient {
     }
     async createWhiteBoard(query, params) {
         const queryParams = this.calculateWbsParams(query);
+        console.log(queryParams);
         const url = this.infiWbsPath + '/u3wbs/wbs/nc/createBoard?'+queryParams;
 
         try {

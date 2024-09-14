@@ -17,6 +17,6 @@ func init() {
 	Config = &config{
 		AppId:       "infi",
 		SignKey:     "infi",
-		InfiWbsPath: "https://dev.plaso.cn",
+		InfiWbsPath: "https://api.infi.cn",
 	}
 }

@@ -29,7 +29,7 @@ public class Main {
             // 获取到sign后调用创建接口 https://infi.cn/static/sdk_doc/openapi/board_api/create_board.html
             HashMap<String, Object> emptyParams = new HashMap<String,Object>();
             // 调用接口创建白板，将接口路径拼接上之前生成的sign即可
-            String createBoardRs= HttpUtil.post("https://dev.plaso.cn/u3wbs/wbs/nc/createBoard?"+sign,emptyParams);
+            String createBoardRs= HttpUtil.post("https://api.infi.cn/u3wbs/wbs/nc/createBoard?"+sign,emptyParams);
             /*
             * {"code":0,"reqId":"req60","reqTime":1702868657525,"obj":{"recordId":"657fb6b1e9ebaa0001bfa7c1"}}
             * 其中recordId为白板唯一ID,需要保存起来，后续针对白板的操作都需要用到

@@ -1,5 +1,5 @@
 module.exports = {
     appId:"infi",
     signKey:"infi",
-    infiWbsPath: "https://dev.plaso.cn",
+    infiWbsPath: "https://api.infi.cn",
 }
