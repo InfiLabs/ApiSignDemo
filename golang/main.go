@@ -6,7 +6,10 @@
 package main
 
 import (
+	"fmt"
+	"golang/accessorySDK"
 	"golang/define"
+	"golang/pkg/crypto"
 	"golang/rpcClient"
 	"log"
 )
@@ -46,9 +49,25 @@ func CalculateBoardConnectParams() {
 	log.Printf("infiQueryUrl:%s", infiQueryUrl)
 }
 
+func GetAccessoryToken() {
+	sdkToken := accessorySDK.NewAccessorySDKToken()
+	signKey := "1234567890123456" // 16/24/32位
+	decrypt, err := crypto.CommonEncrypt(
+		[]byte(sdkToken.String()),
+		1,
+		[]byte(signKey),
+	)
+	if err != nil {
+		log.Fatal("encrypt failed", err)
+	}
+	log.Println(fmt.Sprintf("%s@%s", sdkToken.AppId, string(decrypt)))
+}
+
 func main() {
 	// 创建一块白板
 	CreateBoard()
 	// 计算白板连接参数
 	CalculateBoardConnectParams()
+	// 计算签到token
+	GetAccessoryToken()
 }
