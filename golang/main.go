@@ -66,6 +66,7 @@ func GetAccessoryToken() {
 
 func CreateAccessToken() {
 	tokenObj := auth.CreateAccessToken("appId", "recordId", "loginName", 3600)
+	//tokenObj.SetMessage(auth.MessageType(0), 0)
 	tokenStr, err := tokenObj.Build("appSecret")
 	if err != nil {
 		log.Fatal("token build failed", err)

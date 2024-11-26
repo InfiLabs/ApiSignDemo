@@ -15,7 +15,7 @@ import (
 	"sort"
 )
 
-type Privileges uint16
+type MessageType uint16
 
 // AccessToken 供外部对接app对接用的
 type AccessToken struct {
@@ -91,8 +91,8 @@ func (_this *AccessToken) SetIssueAt() {
 	_this.IssueAt = uint64(util.NowMs())
 }
 
-func (_this *AccessToken) SetDefaultMessage() {
-	_this.Message = make(map[uint16]uint32)
+func (_this *AccessToken) SetMessage(key MessageType, value uint32) {
+	_this.Message[uint16(key)] = value
 }
 
 func (_this *AccessToken) Build(appSecret string) (string, error) {
@@ -139,11 +139,6 @@ func (_this *AccessToken) Build(appSecret string) (string, error) {
 
 	ret = _this.AppId + "@" + base64.StdEncoding.EncodeToString(bytesContent)
 	return ret, nil
-}
-
-func (_this *AccessToken) AddPrivilege(privilege Privileges, expireTimestamp uint32) {
-	pri := uint16(privilege)
-	_this.Message[pri] = expireTimestamp
 }
 
 func GenerateQuery(needEncode bool, params map[string]string) string {
