@@ -11,7 +11,6 @@ import (
 	"golang/auth"
 	"golang/define"
 	"golang/pkg/crypto"
-	"golang/pkg/utils"
 	"golang/rpcClient"
 	"log"
 )
@@ -66,17 +65,12 @@ func GetAccessoryToken() {
 }
 
 func CreateAccessToken() {
-	tokenObj := auth.CreateAccessToken("appId1", "recordId1", "loginName1", 3600)
+	tokenObj := auth.CreateAccessToken("appId", "recordId", "loginName", 3600)
 	tokenStr, err := tokenObj.Build("appSecret")
 	if err != nil {
 		log.Fatal("token build failed", err)
 	}
 	log.Println(tokenStr)
-	unPackTokenObj := auth.AccessToken{}
-	if _, err := unPackTokenObj.Parse(tokenStr); err != nil {
-		log.Fatal("token unpack failed", err)
-	}
-	log.Println(utils.ConvertToJsonStr(unPackTokenObj))
 }
 
 func main() {
@@ -86,6 +80,6 @@ func main() {
 	CalculateBoardConnectParams()
 	// 计算签到token
 	GetAccessoryToken()
-	// 计算accessToken
+	// 计算board accessToken
 	CreateAccessToken()
 }

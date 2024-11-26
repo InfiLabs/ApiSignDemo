@@ -19,3 +19,11 @@ func Prettify(i interface{}) string {
 	resp, _ := json.Marshal(i)
 	return string(resp)
 }
+
+func ConvertToJsonStr(v interface{}) string {
+	r, e := json.Marshal(v)
+	if e != nil {
+		return ""
+	}
+	return string(r)
+}

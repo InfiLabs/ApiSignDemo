@@ -7,12 +7,12 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
-	"golang/pkg/utils"
+	"golang/pkg/pack"
+	"golang/util"
 	"log"
 	"math/big"
 	"net/url"
 	"sort"
-	"strings"
 )
 
 type Privileges uint16
@@ -54,7 +54,7 @@ func PanicHandler() {
 }
 
 func CreateAccessToken(appId, recordId, loginName string, validTime uint64) *AccessToken {
-	issueAt := uint64(utils.NowMs())
+	issueAt := uint64(util.NowMs())
 	salt := random()
 	message := make(map[uint16]uint32)
 
@@ -88,7 +88,7 @@ func (_this *AccessToken) SetSalt() {
 }
 
 func (_this *AccessToken) SetIssueAt() {
-	_this.IssueAt = uint64(utils.NowMs())
+	_this.IssueAt = uint64(util.NowMs())
 }
 
 func (_this *AccessToken) SetDefaultMessage() {
@@ -100,38 +100,38 @@ func (_this *AccessToken) Build(appSecret string) (string, error) {
 
 	_this.Signature = _this.GenSignature(_this.AppId, _this.LoginName, _this.RecordId, _this.ValidTime, appSecret)
 	bufMsg := new(bytes.Buffer)
-	if err := utils.PackString(bufMsg, _this.Signature); err != nil {
+	if err := pack.PackString(bufMsg, _this.Signature); err != nil {
 		log.Printf("packString(signature) %s err: %s\n", _this.Signature, err.Error())
 		return ret, err
 	}
-	if err := utils.PackUint64(bufMsg, _this.Salt); err != nil {
+	if err := pack.PackUint64(bufMsg, _this.Salt); err != nil {
 		log.Printf("packUint64(salt) %d err: %s\n", _this.Salt, err.Error())
 		return ret, err
 	}
-	if err := utils.PackMapUint32(bufMsg, _this.Message); err != nil {
-		log.Printf("packMapUint32(message) %s err: %s\n", utils.ConvertToJsonStr(_this.Message), err.Error())
+	if err := pack.PackMapUint32(bufMsg, _this.Message); err != nil {
+		log.Printf("packMapUint32(message) %s err: %s\n", util.ConvertToJsonStr(_this.Message), err.Error())
 		return ret, err
 	}
 	bytesMsg := bufMsg.Bytes()
 
 	bufContent := new(bytes.Buffer)
-	if err := utils.PackString(bufContent, _this.RecordId); err != nil {
+	if err := pack.PackString(bufContent, _this.RecordId); err != nil {
 		log.Printf("packString(recordId) %s err: %s\n", _this.RecordId, err.Error())
 		return ret, err
 	}
-	if err := utils.PackUint64(bufContent, _this.IssueAt); err != nil {
+	if err := pack.PackUint64(bufContent, _this.IssueAt); err != nil {
 		log.Printf("packUint64(issueAt) %d err: %s\n", _this.IssueAt, err.Error())
 		return ret, err
 	}
-	if err := utils.PackString(bufContent, _this.LoginName); err != nil {
+	if err := pack.PackString(bufContent, _this.LoginName); err != nil {
 		log.Printf("packString(loginName) %s err: %s\n", _this.LoginName, err.Error())
 		return ret, err
 	}
-	if err := utils.PackUint64(bufContent, _this.ValidTime); err != nil {
+	if err := pack.PackUint64(bufContent, _this.ValidTime); err != nil {
 		log.Printf("PackUint64(ValidTime) %d err: %s\n", _this.ValidTime, err.Error())
 		return ret, err
 	}
-	if err := utils.PackString(bufContent, string(bytesMsg[:])); err != nil {
+	if err := pack.PackString(bufContent, string(bytesMsg[:])); err != nil {
 		log.Printf("PackString(bytesMsg) %d err: %s\n", string(bytesMsg[:]), err.Error())
 		return ret, err
 	}
@@ -141,106 +141,9 @@ func (_this *AccessToken) Build(appSecret string) (string, error) {
 	return ret, nil
 }
 
-func (_this *AccessToken) Parse(originToken string) (res bool, err error) {
-	defer PanicHandler()
-
-	originStrList := strings.Split(originToken, "@")
-	if len(originStrList) < 2 {
-		return
-	}
-
-	var decodeByte []byte
-	decodeByte, err = base64.StdEncoding.DecodeString(originToken[len(originStrList[0])+1:])
-	recordId, issueAt, loginName, validTime, msgRawContent, err := UnPackContent(decodeByte)
-	if err != nil {
-		log.Printf("UnPackContent err: %s,can be ignored\n", err.Error())
-		return
-	}
-
-	signature, salt, message, err := UnPackMessages(msgRawContent)
-	if err != nil {
-		log.Println("UnPackMessages err: ", err.Error())
-		return
-	}
-	_this.AppId = originStrList[0]
-	_this.Signature = signature
-	_this.ValidTime = validTime
-	_this.Salt = salt
-	_this.IssueAt = issueAt
-	_this.RecordId = recordId
-	_this.LoginName = loginName
-	_this.Message = message
-	log.Println("content=", utils.ConvertToJsonStr(_this))
-	return true, nil
-}
-
 func (_this *AccessToken) AddPrivilege(privilege Privileges, expireTimestamp uint32) {
 	pri := uint16(privilege)
 	_this.Message[pri] = expireTimestamp
-}
-
-func UnPackContent(buff []byte) (string, uint64, string, uint64, string, error) {
-	in := bytes.NewReader(buff)
-	recordId, err := utils.UnPackString(in)
-	if err != nil {
-		return "", 0, "", 0, "", err
-	}
-
-	issueAt, err := utils.UnPackUint64(in)
-	if err != nil {
-		return "", 0, "", 0, "", err
-	}
-
-	loginName, err := utils.UnPackString(in)
-	if err != nil {
-		return "", 0, "", 0, "", err
-	}
-
-	validTime, err := utils.UnPackUint64(in)
-	if err != nil {
-		return "", 0, "", 0, "", err
-	}
-
-	m, err := utils.UnPackString(in)
-	if err != nil {
-		return "", 0, "", 0, "", err
-	}
-
-	return recordId, issueAt, loginName, validTime, m, nil
-}
-
-func UnPackMessages(msgStr string) (string, uint64, map[uint16]uint32, error) {
-	msgMap := make(map[uint16]uint32)
-
-	msgByte := []byte(msgStr)
-	in := bytes.NewReader(msgByte)
-
-	signature, err := utils.UnPackString(in)
-	if err != nil {
-		return "", 0, msgMap, err
-	}
-	salt, err := utils.UnPackUint64(in)
-	if err != nil {
-		return "", 0, msgMap, err
-	}
-
-	length, err := utils.UnPackUint16(in)
-	if err != nil {
-		return "", 0, msgMap, err
-	}
-	for i := uint16(0); i < length; i++ {
-		key, err := utils.UnPackUint16(in)
-		if err != nil {
-			return "", 0, msgMap, err
-		}
-		value, err := utils.UnPackUint32(in)
-		if err != nil {
-			return "", 0, msgMap, err
-		}
-		msgMap[key] = value
-	}
-
-	return signature, salt, msgMap, nil
 }
 
 func GenerateQuery(needEncode bool, params map[string]string) string {
