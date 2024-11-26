@@ -128,11 +128,11 @@ func (_this *AccessToken) Build(appSecret string) (string, error) {
 		return ret, err
 	}
 	if err := utils.PackUint64(bufContent, _this.ValidTime); err != nil {
-		log.Printf("packUint32(crcRecordId) %d err: %s\n", _this.ValidTime, err.Error())
+		log.Printf("PackUint64(ValidTime) %d err: %s\n", _this.ValidTime, err.Error())
 		return ret, err
 	}
 	if err := utils.PackString(bufContent, string(bytesMsg[:])); err != nil {
-		log.Printf("packUint64(salt) %d err: %s\n", _this.Salt, err.Error())
+		log.Printf("PackString(bytesMsg) %d err: %s\n", string(bytesMsg[:]), err.Error())
 		return ret, err
 	}
 	bytesContent := bufContent.Bytes()
