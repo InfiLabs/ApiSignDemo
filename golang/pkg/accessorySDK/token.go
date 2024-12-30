@@ -2,7 +2,6 @@ package accessorySDK
 
 import (
 	"encoding/json"
-	"time"
 )
 
 type InfiAccessoryUserType string
@@ -26,13 +25,7 @@ func (t *InfiAccessorySDKToken) String() string {
 	return string(jsonData)
 }
 
-func NewAccessorySDKToken() *InfiAccessorySDKToken {
-	appId := "appId"
-	loginName := "loginName"
-	channelId := "channelId"
-	userType := InfiAccessoryUserTypeHost
-	// 设置过期时间24小时
-	expire := time.Now().UnixMilli() + 24*3600*1000
+func NewAccessorySDKToken(appId string, loginName, channelId string, userType InfiAccessoryUserType, expire int64) *InfiAccessorySDKToken {
 	tokenObj := &InfiAccessorySDKToken{
 		AppId:     appId,
 		ChannelId: channelId,

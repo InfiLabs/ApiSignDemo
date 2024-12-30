@@ -6,20 +6,17 @@
 package main
 
 import (
-	"fmt"
-	"golang/accessorySDK"
-	"golang/auth"
-	"golang/define"
-	"golang/pkg/crypto"
-	"golang/rpcClient"
+	"golang/pkg/define"
+	"golang/pkg/rpcClient"
 	"log"
 )
 
-func CreateBoard() {
-	infiHttpClient := rpcClient.GetInfiSdkHttpClient()
+func CreateBoard(appId, secret string) {
+	infiHttpClient := rpcClient.InitInfiSdkHttpClient(appId, secret)
 	// 创建一块白板
+	// creatorId 为白板创建者的用户ID,需要唯一
 	res := infiHttpClient.CreateWhiteBoard(rpcClient.CreateWhiteBoardQuery{
-		CreatorId: "infi",
+		CreatorId: "creatorId",
 	}, rpcClient.CreateWhiteBoardParams{})
 	if res == nil {
 		log.Printf("createBoard failed NetWorkError")
@@ -33,7 +30,8 @@ func CreateBoard() {
 	return
 }
 
-func CalculateBoardConnectParams() {
+func CalculateBoardConnectParams(appId, secret string) {
+	infiHttpClient := rpcClient.InitInfiSdkHttpClient(appId, secret)
 	// 开始生成query
 	var infiBalanceQueryParams = rpcClient.InfiBalanceQueryParams{
 		RecordId:       "recordId",      // 创建白板接口返回的recordId
@@ -45,42 +43,27 @@ func CalculateBoardConnectParams() {
 		VersionDays:    180,
 		Crypto:         1,
 	}
-	_, infiQueryUrl := rpcClient.GetInfiSdkHttpClient().
+	_, infiQueryUrl := infiHttpClient.
 		CalculateBalanceParams(rpcClient.StructToQueryParams(infiBalanceQueryParams))
 	log.Printf("infiQueryUrl:%s", infiQueryUrl)
 }
 
-func GetAccessoryToken() {
-	sdkToken := accessorySDK.NewAccessorySDKToken()
-	signKey := "1234567890123456" // 16/24/32位
-	decrypt, err := crypto.CommonEncrypt(
-		[]byte(sdkToken.String()),
-		1,
-		[]byte(signKey),
-	)
-	if err != nil {
-		log.Fatal("encrypt failed", err)
-	}
-	log.Println(fmt.Sprintf("%s@%s", sdkToken.AppId, string(decrypt)))
-}
-
-func CreateAccessToken() {
-	tokenObj := auth.CreateAccessToken("appId", "recordId", "loginName", 3600)
-	//tokenObj.SetMessage(auth.MessageType(0), 0)
-	tokenStr, err := tokenObj.Build("appSecret")
-	if err != nil {
-		log.Fatal("token build failed", err)
-	}
-	log.Println(tokenStr)
-}
-
 func main() {
-	// 创建一块白板
-	CreateBoard()
-	// 计算白板连接参数
-	CalculateBoardConnectParams()
-	// 计算签到token
-	GetAccessoryToken()
-	// 计算board accessToken
-	CreateAccessToken()
+	/*
+	 * title: 调用InfiApi创建一块画布
+	 * desc: 调用InfiWebSdk的RestApi创建一块画布并获取到recordId,用于提供给InfiWebSdk前端使用
+	 * url: https://developer.infi.cn/docs/restfulApi/board/create_board
+	 * @appId 为英飞分配的appId
+	 * @secret 为英飞分配的secret
+	 * */
+	CreateBoard("demo", "3oGPeNTjHdvxX2h7tR35OfPVOqYJQrzI")
+
+	/*
+	 * title: 计算 InfiWebSdk 所需的签名串
+	 * desc: 用于下发给前端InfiWebSdk中作为getQueryString参数使用
+	 * url: https://developer.infi.cn/docs/guide/prepare/getQueryString
+	 * @appId 为英飞分配的appId
+	 * @secret 为英飞分配的secret
+	 * */
+	CalculateBoardConnectParams("demo", "3oGPeNTjHdvxX2h7tR35OfPVOqYJQrzI")
 }

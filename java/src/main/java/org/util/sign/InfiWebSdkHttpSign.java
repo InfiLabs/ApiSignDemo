@@ -1,15 +1,15 @@
-package org.example;
+package org.util.sign;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class InfiHttpSignDemo {
+public class InfiWebSdkHttpSign {
     private final String appId;
     private final String signKey;
     // 构造函数
-    public InfiHttpSignDemo(String appId, String signKey) {
+    public InfiWebSdkHttpSign(String appId, String signKey) {
         this.appId = appId;
         this.signKey = signKey;
     }

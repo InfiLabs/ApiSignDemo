@@ -1,4 +1,4 @@
-package org.example;
+package org.util.sign;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -6,10 +6,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
-public class InfiBoardQuerySignDemo {
+public class InfiWebSdkBoardQuerySign {
     private final String appId;
     private final String signKey;
-    public InfiBoardQuerySignDemo(String appId, String signKey) {
+    public InfiWebSdkBoardQuerySign(String appId, String signKey) {
         this.appId = appId;
         this.signKey = signKey;
     }

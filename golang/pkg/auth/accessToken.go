@@ -8,7 +8,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"golang/pkg/pack"
-	"golang/util"
+	"golang/pkg/util"
 	"log"
 	"math/big"
 	"net/url"

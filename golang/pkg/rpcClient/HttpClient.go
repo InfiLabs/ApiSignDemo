@@ -3,10 +3,11 @@ package rpcClient
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-resty/resty/v2"
-	"golang/util"
+	"golang/pkg/util"
 	"log"
 	"reflect"
+
+	"github.com/go-resty/resty/v2"
 )
 
 type QueryParams map[string]string

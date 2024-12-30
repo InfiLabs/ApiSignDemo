@@ -1,8 +1,8 @@
 package rpcClient
 
 import (
-	"golang/define"
-	"golang/util"
+	"golang/pkg/define"
+	"golang/pkg/util"
 )
 
 type InfiSdkResponse[T any] struct {

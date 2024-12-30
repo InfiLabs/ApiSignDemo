@@ -5,8 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"fmt"
-	"golang/config"
-	"golang/util"
+	"golang/pkg/util"
 	"log"
 	"sort"
 	"strconv"
@@ -135,23 +134,17 @@ func (_this *InfiSdkHttpClient) CreateWhiteBoard(
 ) *InfiSdkResponse[CreateWhiteBoardResponse] {
 	queryParams, _ := _this.CalculateWbsParams(StructToQueryParams(query))
 	res := HttpPost[InfiSdkResponse[CreateWhiteBoardResponse]](
-		config.Config.InfiWbsPath+"/u3wbs/wbs/nc/createBoard",
+		"https://api.infi.cn/u3wbs/wbs/nc/createBoard",
 		queryParams,
 		params,
 	)
 	return res
 }
 
-func InitInfiSdkHttpClient() {
+func InitInfiSdkHttpClient(appId, signKey string) *InfiSdkHttpClient {
 	infiSdkHttpClientInstance = &InfiSdkHttpClient{
-		appId:   config.Config.AppId,
-		signKey: config.Config.SignKey,
-	}
-}
-
-func GetInfiSdkHttpClient() *InfiSdkHttpClient {
-	if infiSdkHttpClientInstance == nil {
-		InitInfiSdkHttpClient()
+		appId:   appId,
+		signKey: signKey,
 	}
 	return infiSdkHttpClientInstance
 }
